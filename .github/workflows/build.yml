@@ -1,0 +1,29 @@
+name: build-templates
+on: [push]
+jobs:
+  find-templates:
+    runs-on: ubuntu-latest
+    outputs:
+      templates: ${{ steps.set-templates.outputs.templates }}
+    steps:
+      - uses: actions/checkout@v2
+      - id: set-templates
+        run: |
+          echo "templates=$(ls templates | jq -R '[.]' | jq -s -c 'add')" >> $GITHUB_OUTPUT
+  instantiate-and-build:
+    needs: find-templates
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        TEMPLATE: ${{ fromJson(needs.find-templates.outputs.templates) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+      - name: Create temporary folder
+        run: TMPDIR=$RUNNER_TEMP/${{ matrix.TEMPLATE }}
+      - name: Instantiate template
+        run: (cd $TMPDIR && nix flake init --refresh --template $GITHUB_WORKSPACE#templates.${{ matrix.TEMPLATE }})
+      - name: Build template
+        run: (cd $TMPDIR && nix build)

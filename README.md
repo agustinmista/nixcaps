@@ -1,8 +1,10 @@
 # nixcaps
 
+[![CI](https://github.com/agustinmista/nixcaps/actions/workflows/build.yml/badge.svg)](https://github.com/agustinmista/nixcaps/actions/workflows/build.yml)
+
 **Nix flake to compile out-of-tree QMK firmwares**
 
-The goal of this project is to provide a simple Nix derivation to build QMK-based firmware for your favorite programmable keyboards.
+The goal of this project is to provide a simple Nix derivation to build QMK-based firmwares for your favorite programmable keyboards.
 
 ## Usage
 
@@ -14,9 +16,9 @@ Inputs:
 
 - `src` (`Path`): the path to the directory containing your QMK config files
 - `keyboard` (`String`): the path inside `keyboards` in the `qmk_firmare` repo that where your keyboard model is defined (e.g., `preonic`, `zsa/moonlander`)
-- `variant` (`String` | `Null`): the concrete variant of your keyboard, in case more than one exists (e.g., the `rev3_drop` variant of `preonic`, or the `base` variant of `ergodox_ez`).
-- `target` (`String` | `Null`): the basename of the compiled firmware file (i.e., without any extension)
-- `flash` (`String -> String` | `Null`): a function that takes the resolved basename of the compiled firmware and returns a (possibly multiline) script that flashes it into your keyboard. When provided, this will generate a `flash` executable in the derivation's output path.
+- `variant` (`String`, optional): the concrete variant of your keyboard, in case more than one exists (e.g., the `rev3_drop` variant of `preonic`, or the `base` variant of `ergodox_ez`).
+- `target` (`String`, optional): the basename of the compiled firmware file (i.e., without any extension)
+- `flash` (`String -> String`, optional): a function that takes the resolved basename of the compiled firmware and returns a (possibly multiline) script that flashes it into your keyboard. When provided, this will generate a `flash` executable in the derivation's output path.
 
 ## Example
 

@@ -51,7 +51,7 @@ Here is a minimal example showing how to use `nixcaps` as an input to your flake
         packages.default = compile {
           keyboard = "ergodox_ez";
           variant = "base";
-          src = ./.;
+          src = ./.; # path to your keymap files
           flash = fw: ''
             echo "Flashing ${fw}.hex ..."
             ${pkgs.teensy-loader-cli}/bin/teensy-loader-cli -mmcu=atmega32u4 -v -w ${fw}.hex
@@ -65,16 +65,28 @@ Here is a minimal example showing how to use `nixcaps` as an input to your flake
 This example is also packaged as a template you can try locally by running:
 
 ```bash
+$ # instantiate the template locally
 $ nix flake new nixcaps --template github:agustinmista/nixcaps#ergodox_ez
 $ cd nixcaps
+$ # compile the firmware
 $ nix build
+$ ls result/bin
+flash  # flasher script
+fw.elf # firmware files
+fw.hex # ...
+$ # flash the compiled firmware
 $ sudo ./result/bin/flash
+Flashing /nix/store/b5jnf80...-nixcaps-compile/bin/fw.hex ...
+Teensy Loader, Command Line, Version 2.3
+Read "/nix/store/b5jnf80...-nixcaps-compile/bin/fw.hex": 28074 bytes, 87.0% usage
+Waiting for Teensy device...
+ (hint: press the reset button)
 ```
 
 ## Notes
 
-- Under the hood, this derivation first copies the files in `src` into `keyboards/<keyboard>/keymaps/nixcaps` inside the `qmk_firmare`, and then executes `qmk compile --keyboard <keyboard>[/<variant>] --keymap nixcaps`.
+- Under the hood, this derivation first copies the files in `src` into `keyboards/<keyboard>/keymaps/nixcaps` inside an internal copy of the `qmk_firmware` repo, and then executes `qmk compile --keyboard <keyboard>[/<variant>] --keymap nixcaps`.
 
-- While it should be possible to flash the compiled firmwares using `qmk flash`, this command is only available while inside the `qmk_firmware` repo. So, it is not enough to provide such a derivation with just the compiled firmware, and one would have to copy the entire (or a large part of) the `qmk_firmware` as well. If you know how to implement this in an efficient way, let me know!
+- While it should be possible to flash the compiled firmwares using `qmk flash`, this command is only available while inside the `qmk_firmware` repo. So, it is not enough to provide such a derivation with just the compiled firmware, and one would have to copy the entire (or a large part of) the `qmk_firmware` repo as well. If you know how to implement this in an efficient way, let me know!
 
 - To ensure reproducibily, this builder calls `qmk compile` with the `SKIP_GIT=true` env var. This avoids some of the issues [others have observed](https://discourse.nixos.org/t/fetchgit-hash-mismatch-with-qmk-firmware-submodules/49667) while trying work with `qmk_firmware` in Nix. If your keyboard config relies on `qmk compile` using git for any reason, this probably won't work!

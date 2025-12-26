@@ -63,5 +63,6 @@ rec {
         buildDrv
         (lib.optional (!isNull flash) flashDrv)
       ];
+      meta.mainProgram = "flash";
     };
 }

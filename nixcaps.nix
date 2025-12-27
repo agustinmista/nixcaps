@@ -4,6 +4,7 @@
   stdenv,
   writeShellScriptBin,
   symlinkJoin,
+  lib,
 }:
 rec {
   qmk_firmware = fetchFromGitHub {
@@ -56,9 +57,9 @@ rec {
     in
       symlinkJoin {
         name = "nixcaps-output";
-        paths = [
+        paths = lib.flatten [
           buildDrv
-          flashDrv
+          (lib.optional (!isNull flash) flashDrv)
         ];
       };
 }

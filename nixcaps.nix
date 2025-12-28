@@ -2,6 +2,8 @@
   qmk,
   fetchFromGitHub,
   stdenv,
+  writeShellScriptBin,
+  symlinkJoin,
   lib,
 }:
 rec {
@@ -27,36 +29,37 @@ rec {
       keyboardVariant = if builtins.isNull variant then "${keyboard}" else "${keyboard}/${variant}";
       keymapName = "nixcaps";
       keymapDir = "${keyboardDir}/keymaps/${keymapName}";
-    in
-    stdenv.mkDerivation {
-      name = "nixcaps-compile";
-      src = qmk_firmware;
-      buildInputs = [ qmk ];
-      postPatch = ''
-        mkdir -p ${keymapDir}
-        cp -r ${src}/* ${keymapDir}/
-      '';
-      buildPhase = ''
-        qmk compile \
-          --env SKIP_GIT=true \
-          --env BUILD_DIR=${buildDir} \
-          --env TARGET=${target} \
-          --keyboard ${keyboardVariant} \
-          --keymap ${keymapName}
-      '';
-      installPhase = ''
-        mkdir -p $out/bin
-        cp ${buildDir}/*.{hex,bin,elf,dfu,uf2,eep} $out/bin
+      buildDrv = stdenv.mkDerivation {
+        name = "nixcaps-compile";
+        src = qmk_firmware;
+        buildInputs = [ qmk ];
+        postPatch = ''
+            mkdir -p ${keymapDir}
+            cp -r ${src}/* ${keymapDir}/
+        '';
+        buildPhase = ''
+            qmk compile \
+             --env SKIP_GIT=true \
+             --env BUILD_DIR=${buildDir} \
+             --env TARGET=${target} \
+             --keyboard ${keyboardVariant} \
+             --keymap ${keymapName}
+        '';
+        installPhase = ''
+            mkdir -p $out/bin
+            cp ${buildDir}/*.{hex,bin,elf,dfu,uf2,eep} $out/bin
+        '';
+        dontFixup = true;
+      };
 
-        ${lib.optionalString (!builtins.isNull flash) ''
-          cat > $out/bin/flash <<EOF
-          #!/bin/sh
-          set -e
-          ${flash (placeholder "out" + "/bin/${target}")}
-          EOF
-          chmod +x $out/bin/flash
-        ''}
-      '';
-      dontFixup = true;
-    };
+      flashText = flash "${buildDrv}/bin/${target}";
+      flashDrv = (writeShellScriptBin "flash" flashText).overrideAttrs (_: { name = "nixcaps-flash-script"; });
+    in
+      symlinkJoin {
+        name = "nixcaps-output";
+        paths = lib.flatten [
+          buildDrv
+          (lib.optional (!isNull flash) flashDrv)
+        ];
+      };
 }

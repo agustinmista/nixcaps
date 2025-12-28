@@ -1,19 +1,12 @@
 {
+  qmk_firmware,
   qmk,
-  fetchFromGitHub,
   stdenv,
   writeShellScriptBin,
   symlinkJoin,
   lib,
 }:
-rec {
-  qmk_firmware = fetchFromGitHub {
-    owner = "qmk";
-    repo = "qmk_firmware";
-    rev = "0.30.3";
-    sha256 = "sha256-lM5B9xl7sSxGhI/fbS0ys22t5oVUp8aMLI4pzICEKHk=";
-    fetchSubmodules = true;
-  };
+{
   compile =
     {
       keyboard,

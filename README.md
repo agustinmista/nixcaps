@@ -85,6 +85,12 @@ Waiting for Teensy device...
 
 ## Notes
 
+- You can change the version of `qmk_firmware` used by nixcaps by overriding its `qmk_firmware` flake input as follows:
+
+  ```nix
+  nixcaps.inputs.qmk_firmware.url = "git+https://github.com/qmk/qmk_firmware?submodules=1&rev=<COMMIT_SHA>";
+  ```
+
 - Under the hood, this derivation first copies the files in `src` into `keyboards/<keyboard>/keymaps/nixcaps` inside an internal copy of the `qmk_firmware` repo, and then executes `qmk compile --keyboard <keyboard>[/<variant>] --keymap nixcaps`.
 
 - While it should be possible to flash the compiled firmwares using `qmk flash`, this command is only available while inside the `qmk_firmware` repo. So, it is not enough to provide such a derivation with just the compiled firmware, and one would have to copy the entire (or a large part of) the `qmk_firmware` repo as well. If you know how to implement this in an efficient way, let me know!

@@ -1,6 +1,16 @@
 name: build-templates
 on: [push]
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Nix
+        uses: cachix/install-nix-action@v31
+      - name: Format Nix files
+        run: find -type f -name '*.nix' | xargs nix fmt -- --check --strict
   find-templates:
     runs-on: ubuntu-latest
     outputs:

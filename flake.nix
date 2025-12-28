@@ -15,12 +15,8 @@
         nixcaps = pkgs.callPackage ./nixcaps.nix { };
       in
       {
-        packages = {
-          inherit (nixcaps)
-            compile
-            qmk_firmware
-            ;
-        };
+        packages = { inherit (nixcaps) compile qmk_firmware; };
+        formatter = pkgs.nixfmt-rfc-style;
       }
     ))
     // {

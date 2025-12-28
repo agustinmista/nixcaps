@@ -34,32 +34,34 @@ rec {
         src = qmk_firmware;
         buildInputs = [ qmk ];
         postPatch = ''
-            mkdir -p ${keymapDir}
-            cp -r ${src}/* ${keymapDir}/
+          mkdir -p ${keymapDir}
+          cp -r ${src}/* ${keymapDir}/
         '';
         buildPhase = ''
-            qmk compile \
-             --env SKIP_GIT=true \
-             --env BUILD_DIR=${buildDir} \
-             --env TARGET=${target} \
-             --keyboard ${keyboardVariant} \
-             --keymap ${keymapName}
+          qmk compile \
+            --env SKIP_GIT=true \
+            --env BUILD_DIR=${buildDir} \
+            --env TARGET=${target} \
+            --keyboard ${keyboardVariant} \
+            --keymap ${keymapName}
         '';
         installPhase = ''
-            mkdir -p $out/bin
-            cp ${buildDir}/*.{hex,bin,elf,dfu,uf2,eep} $out/bin
+          mkdir -p $out/bin
+          cp ${buildDir}/*.{hex,bin,elf,dfu,uf2,eep} $out/bin
         '';
         dontFixup = true;
       };
 
       flashText = flash "${buildDrv}/bin/${target}";
-      flashDrv = (writeShellScriptBin "flash" flashText).overrideAttrs (_: { name = "nixcaps-flash-script"; });
+      flashDrv = (writeShellScriptBin "flash" flashText).overrideAttrs (_: {
+        name = "nixcaps-flash-script";
+      });
     in
-      symlinkJoin {
-        name = "nixcaps-output";
-        paths = lib.flatten [
-          buildDrv
-          (lib.optional (!isNull flash) flashDrv)
-        ];
-      };
+    symlinkJoin {
+      name = "nixcaps-output";
+      paths = lib.flatten [
+        buildDrv
+        (lib.optional (!isNull flash) flashDrv)
+      ];
+    };
 }

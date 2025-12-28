@@ -28,7 +28,7 @@ jobs:
         TEMPLATE: ${{ fromJson(needs.find-templates.outputs.templates) }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Nix
         uses: cachix/install-nix-action@v31
       - name: Create temporary folder
@@ -36,4 +36,4 @@ jobs:
       - name: Instantiate template
         run: (cd $TMPDIR && nix flake init --refresh --template $GITHUB_WORKSPACE#templates.${{ matrix.TEMPLATE }})
       - name: Build template
-        run: (cd $TMPDIR && nix build)
+        run: (cd $TMPDIR && nix build --override-input nixcaps $GITHUB_WORKSPACE)

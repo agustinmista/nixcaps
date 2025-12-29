@@ -75,7 +75,7 @@ flash  # flasher script
 fw.elf # firmware files
 fw.hex # ...
 $ # flash the compiled firmware
-$ sudo ./result/bin/flash
+$ sudo ./result/bin/flash # or nix run
 Flashing /nix/store/b5jnf80...-nixcaps-compile/bin/fw.hex ...
 Teensy Loader, Command Line, Version 2.3
 Read "/nix/store/b5jnf80...-nixcaps-compile/bin/fw.hex": 28074 bytes, 87.0% usage

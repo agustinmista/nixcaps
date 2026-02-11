@@ -51,6 +51,10 @@
           path = ./templates/ergodox_ez;
           description = "A simple flake to build a firmware for the Ergodox EZ keyboard";
         };
+        multiple_keyboards = {
+          path = ./templates/multiple_keyboards;
+          description = "A flake demonstrating how to build firmwares for multiple keyboards";
+        };
       };
     };
 }

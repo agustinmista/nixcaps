@@ -1,5 +1,5 @@
 {
-  description = "QMK firmware builder for the Ergodox EZ keyboard";
+  description = "QMK firmware builder for multiple keyboards";
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -11,34 +11,40 @@
   };
 
   outputs =
-    inputs@{
-      flake-utils,
-      nixpkgs,
-      ...
-    }:
+    inputs@{ flake-utils, nixpkgs, ... }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         nixcaps = inputs.nixcaps.lib.${system};
-        ergodoz_ez = {
-          src = ./.;
+        moonlander = {
+          src = ./moonlander;
           # path within the qmk_firmware tree
           # to the keyboard's directory,
           # relative to the top-level `keyboards/`
           # directory
-          keyboard = "ergodox_ez";
+          keyboard = "zsa/moonlander";
           # keyboard variant, if any;
           # this is relative to the keyboard directory
           # and should contain a `keyboard.json` file
-          variant = "base";
+          # variant = "...";
+        };
+        togkey_pad_plus = {
+          src = ./togkey_pad_plus;
+          keyboard = "togkey/pad_plus";
         };
       in
       {
-        # Build with `nix build`
-        packages.default = nixcaps.mkQmkFirmware ergodoz_ez;
-        # Flash with `nix run`
-        apps.default = nixcaps.flashQmkFirmware ergodoz_ez;
+        # Build with `nix build .#moonlander` or `nix build .#togkey`
+        packages = {
+          moonlander = nixcaps.mkQmkFirmware moonlander;
+          togkey = nixcaps.mkQmkFirmware togkey_pad_plus;
+        };
+        # Flash with `nix run .#moonlander` or `nix run .#togkey`
+        apps = {
+          moonlander = nixcaps.flashQmkFirmware moonlander;
+          togkey = nixcaps.flashQmkFirmware togkey_pad_plus;
+        };
         devShells.default = pkgs.mkShell {
           QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];

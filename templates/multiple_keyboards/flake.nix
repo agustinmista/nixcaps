@@ -33,6 +33,8 @@
           src = ./togkey_pad_plus;
           keyboard = "togkey/pad_plus";
         };
+        moonlander-compile-db = nixcaps.mkCompileDb moonlander;
+        togkey_pad_plus-compile-db = nixcaps.mkCompileDb togkey_pad_plus;
       in
       {
         # Build with `nix build .#moonlander` or `nix build .#togkey`
@@ -48,6 +50,10 @@
         devShells.default = pkgs.mkShell {
           QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];
+          shellHook = ''
+            ln -sf "${moonlander-compile-db}/compile_commands.json" ./moonlander/compile_commands.json
+            ln -sf "${togkey_pad_plus-compile-db}/compile_commands.json" ./togkey_pad_plus/compile_commands.json
+          '';
         };
       }
     );

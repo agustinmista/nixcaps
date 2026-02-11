@@ -42,6 +42,13 @@
         devShells.default = pkgs.mkShell {
           QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];
+          shellHook =
+            let
+              compile_db = nixcaps.mkCompileDb ergodoz_ez;
+            in
+            ''
+              ln -sf "${compile_db}/compile_commands.json" ./compile_commands.json
+            '';
         };
       }
     );

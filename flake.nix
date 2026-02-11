@@ -26,6 +26,7 @@
         pkgs = nixpkgs.legacyPackages.${system};
         mkQmkFirmware = pkgs.callPackage (import ./nix/build.nix qmk_firmware) { };
         mkFlashQmkFirmware = pkgs.callPackage (import ./nix/flash.nix qmk_firmware) { };
+        mkCompileDb = pkgs.callPackage (import ./nix/compiledb.nix qmk_firmware) { };
         flashQmkFirmware =
           args:
           let
@@ -39,7 +40,7 @@
       {
         formatter = pkgs.nixfmt-rfc-style;
         lib = {
-          inherit mkQmkFirmware flashQmkFirmware;
+          inherit mkQmkFirmware flashQmkFirmware mkCompileDb;
         };
       }
     ))

@@ -113,26 +113,26 @@ For projects with multiple keyboards, you can define separate configurations:
           src = ./moonlander;
           keyboard = "zsa/moonlander";
         };
-        togkey_pad_plus = {
-          src = ./togkey_pad_plus;
-          keyboard = "togkey/pad_plus";
+        thekey = {
+          src = ./thekey;
+          keyboard = "drop/thekey/v2";
         };
       in
       {
         packages = {
           moonlander = nixcaps.mkQmkFirmware moonlander;
-          togkey = nixcaps.mkQmkFirmware togkey_pad_plus;
+          thekey = nixcaps.mkQmkFirmware thekey;
         };
         apps = {
           moonlander = nixcaps.flashQmkFirmware moonlander;
-          togkey = nixcaps.flashQmkFirmware togkey_pad_plus;
+          thekey = nixcaps.flashQmkFirmware thekey;
         };
         devShells.default = pkgs.mkShell {
           QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];
           shellHook = ''
             ln -sf "${nixcaps.mkCompileDb moonlander}/compile_commands.json" ./moonlander/compile_commands.json
-            ln -sf "${nixcaps.mkCompileDb togkey_pad_plus}/compile_commands.json" ./togkey_pad_plus/compile_commands.json
+            ln -sf "${nixcaps.mkCompileDb thekey}/compile_commands.json" ./thekey/compile_commands.json
           '';
         };
       }
@@ -144,7 +144,7 @@ Build and flash specific keyboards:
 
 ```bash
 $ nix build .#moonlander   # build moonlander firmware
-$ nix run .#togkey         # flash togkey firmware
+$ nix run .#thekey         # flash thekey firmware
 ```
 
 This example is available as a template:

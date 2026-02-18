@@ -29,28 +29,28 @@
           # and should contain a `keyboard.json` file
           # variant = "...";
         };
-        togkey_pad_plus = {
-          src = ./togkey_pad_plus;
-          keyboard = "togkey/pad_plus";
+        thekey = {
+          src = ./thekey;
+          keyboard = "drop/thekey/v2";
         };
       in
       {
-        # Build with `nix build .#moonlander` or `nix build .#togkey`
+        # Build with `nix build .#moonlander` or `nix build .#thekey`
         packages = {
           moonlander = nixcaps.mkQmkFirmware moonlander;
-          togkey = nixcaps.mkQmkFirmware togkey_pad_plus;
+          thekey = nixcaps.mkQmkFirmware thekey;
         };
-        # Flash with `nix run .#moonlander` or `nix run .#togkey`
+        # Flash with `nix run .#moonlander` or `nix run .#thekey`
         apps = {
           moonlander = nixcaps.flashQmkFirmware moonlander;
-          togkey = nixcaps.flashQmkFirmware togkey_pad_plus;
+          thekey = nixcaps.flashQmkFirmware thekey;
         };
         devShells.default = pkgs.mkShell {
           QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];
           shellHook = ''
             ln -sf "${nixcaps.mkCompileDb moonlander}/compile_commands.json" ./moonlander/compile_commands.json
-            ln -sf "${nixcaps.mkCompileDb togkey_pad_plus}/compile_commands.json" ./togkey_pad_plus/compile_commands.json
+            ln -sf "${nixcaps.mkCompileDb thekey}/compile_commands.json" ./thekey/compile_commands.json
           '';
         };
       }

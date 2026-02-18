@@ -38,6 +38,18 @@ jobs:
       - name: Create temporary folder
         run: TMPDIR=$RUNNER_TEMP/${{ matrix.TEMPLATE }}
       - name: Instantiate template
-        run: (cd $TMPDIR && nix flake init --refresh --template $GITHUB_WORKSPACE#templates.${{ matrix.TEMPLATE }})
+        run: |
+          (cd $TMPDIR && \
+            nix flake init \
+              --refresh \
+              --template $GITHUB_WORKSPACE#templates.${{ matrix.TEMPLATE }} \
+          )
       - name: Build template
-        run: (cd $TMPDIR && nix build --override-input nixcaps $GITHUB_WORKSPACE)
+        run: |
+          (cd $TMPDIR && \
+            nix flake show \
+              --all-systems \
+              --json | \
+                jq -r '.packages."x86_64-linux" | keys[]' | \
+                xargs -I {} nix build --override-input nixcaps $GITHUB_WORKSPACE .#{} \
+          )

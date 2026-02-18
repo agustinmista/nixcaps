@@ -11,11 +11,7 @@
   };
 
   outputs =
-    inputs@{
-      flake-utils,
-      nixpkgs,
-      ...
-    }:
+    inputs@{ flake-utils, nixpkgs, ... }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let

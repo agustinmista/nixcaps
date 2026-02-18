@@ -39,9 +39,7 @@
       in
       {
         formatter = pkgs.nixfmt-rfc-style;
-        lib = {
-          inherit mkQmkFirmware flashQmkFirmware mkCompileDb;
-        };
+        lib = { inherit mkQmkFirmware flashQmkFirmware mkCompileDb; };
       }
     ))
     // {

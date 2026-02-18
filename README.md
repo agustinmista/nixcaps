@@ -6,23 +6,33 @@
 
 The goal of this project is to provide a simple Nix derivation to build QMK-based firmwares for your favorite programmable keyboards.
 
+## Features
+
+- Build QMK firmwares reproducibly with Nix
+- Flash firmwares directly via `nix run`
+- Full `clangd` LSP support via `compile_commands.json` generation
+
 ## Usage
 
-### Compiling
+### API
 
-`compile :: { src, keyboard, variant ? null, target ? "fw", flash ? null  }`
+nixcaps exposes the following functions via `nixcaps.lib.${system}`:
 
-Inputs:
+- `mkQmkFirmware { src, keyboard, variant? }` - Builds the QMK firmware
+- `flashQmkFirmware { src, keyboard, variant? }` - Returns a flake app that flashes the firmware
+- `mkCompileDb { src, keyboard, variant? }` - Generates `compile_commands.json` for `clangd` LSP support
 
-- `src` (`Path`): the path to the directory containing your QMK config files
-- `keyboard` (`String`): the path inside `keyboards` in the `qmk_firmare` repo that where your keyboard model is defined (e.g., `preonic`, `zsa/moonlander`)
-- `variant` (`String`, optional): the concrete variant of your keyboard, in case more than one exists (e.g., the `rev3_drop` variant of `preonic`, or the `base` variant of `ergodox_ez`).
-- `target` (`String`, optional): the basename of the compiled firmware file (i.e., without any extension)
-- `flash` (`String -> String`, optional): a function that takes the resolved basename of the compiled firmware and returns a (possibly multiline) script that flashes it into your keyboard. When provided, this will generate a `flash` executable in the derivation's output path.
+Parameters:
 
-## Example
+- `src` (`Path`): the path to the directory containing your QMK keymap files
+- `keyboard` (`String`): the path inside `keyboards` in the `qmk_firmware` repo where your keyboard model is defined (e.g., `preonic`, `zsa/moonlander`)
+- `variant` (`String`, optional): the concrete variant of your keyboard, in case more than one exists (e.g., the `rev3_drop` variant of `preonic`, or the `base` variant of `ergodox_ez`)
 
-Here is a minimal example showing how to use `nixcaps` as an input to your flakes and invoke the firmware builder for a given keyboard model/variant (original Ergodox EZ with ATmega32U4).
+## Examples
+
+### Single Keyboard
+
+Here is a minimal example showing how to use `nixcaps` for the Ergodox EZ keyboard:
 
 **flake.nix**:
 
@@ -35,27 +45,35 @@ Here is a minimal example showing how to use `nixcaps` as an input to your flake
   };
 
   outputs =
-    {
-      nixpkgs,
+    inputs@{
       flake-utils,
-      nixcaps,
+      nixpkgs,
       ...
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
-        compile = nixcaps.packages.${system}.compile;
-      in
-      {
-        packages.default = compile {
+        nixcaps = inputs.nixcaps.lib.${system};
+        ergodox_ez = {
+          src = ./.;
           keyboard = "ergodox_ez";
           variant = "base";
-          src = ./.; # path to your keymap files
-          flash = fw: ''
-            echo "Flashing ${fw}.hex ..."
-            ${pkgs.teensy-loader-cli}/bin/teensy-loader-cli -mmcu=atmega32u4 -v -w ${fw}.hex
-          '';
+        };
+      in
+      {
+        packages.default = nixcaps.mkQmkFirmware ergodox_ez;
+        apps.default = nixcaps.flashQmkFirmware ergodox_ez;
+        devShells.default = pkgs.mkShell {
+          QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
+          packages = [ pkgs.qmk ];
+          shellHook =
+            let
+              compile_db = nixcaps.mkCompileDb ergodox_ez;
+            in
+            ''
+              ln -sf "${compile_db}/compile_commands.json" ./compile_commands.json
+            '';
         };
       }
     );
@@ -65,30 +83,97 @@ Here is a minimal example showing how to use `nixcaps` as an input to your flake
 This example is also packaged as a template you can try locally by running:
 
 ```bash
-$ # instantiate the template locally
-$ nix flake new nixcaps --template github:agustinmista/nixcaps#ergodox_ez
-$ cd nixcaps
-$ # compile the firmware
-$ nix build
-$ ls result/bin
-flash  # flasher script
-fw.elf # firmware files
-fw.hex # ...
-$ # flash the compiled firmware
-$ sudo ./result/bin/flash # or nix run
-Flashing /nix/store/b5jnf80...-nixcaps-compile/bin/fw.hex ...
-Teensy Loader, Command Line, Version 2.3
-Read "/nix/store/b5jnf80...-nixcaps-compile/bin/fw.hex": 28074 bytes, 87.0% usage
-Waiting for Teensy device...
- (hint: press the reset button)
+$ nix flake new my-keyboard --template github:agustinmista/nixcaps#ergodox_ez
+$ cd my-keyboard
+$ nix build        # compile the firmware
+$ nix run          # flash the firmware
+$ nix develop      # enter dev shell with LSP support
 ```
+
+### Multiple Keyboards
+
+For projects with multiple keyboards, you can define separate configurations:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    nixcaps.url = "github:agustinmista/nixcaps";
+  };
+
+  outputs =
+    inputs@{
+      flake-utils,
+      nixpkgs,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nixcaps = inputs.nixcaps.lib.${system};
+        moonlander = {
+          src = ./moonlander;
+          keyboard = "zsa/moonlander";
+        };
+        togkey_pad_plus = {
+          src = ./togkey_pad_plus;
+          keyboard = "togkey/pad_plus";
+        };
+      in
+      {
+        packages = {
+          moonlander = nixcaps.mkQmkFirmware moonlander;
+          togkey = nixcaps.mkQmkFirmware togkey_pad_plus;
+        };
+        apps = {
+          moonlander = nixcaps.flashQmkFirmware moonlander;
+          togkey = nixcaps.flashQmkFirmware togkey_pad_plus;
+        };
+        devShells.default = pkgs.mkShell {
+          QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
+          packages = [ pkgs.qmk ];
+          shellHook = ''
+            ln -sf "${nixcaps.mkCompileDb moonlander}/compile_commands.json" ./moonlander/compile_commands.json
+            ln -sf "${nixcaps.mkCompileDb togkey_pad_plus}/compile_commands.json" ./togkey_pad_plus/compile_commands.json
+          '';
+        };
+      }
+    );
+}
+```
+
+Build and flash specific keyboards:
+
+```bash
+$ nix build .#moonlander   # build moonlander firmware
+$ nix run .#togkey         # flash togkey firmware
+```
+
+This example is available as a template:
+
+```bash
+$ nix flake new my-keyboards --template github:agustinmista/nixcaps#multiple_keyboards
+```
+
+## LSP Support
+
+nixcaps provides full `clangd` LSP support for your keymap files. The `mkCompileDb` function generates a `compile_commands.json` file that `clangd` uses for code intelligence features like:
+
+- Go to definition
+- Find references
+- Autocompletion
+- Diagnostics
+
+To enable LSP support, add a dev shell to your flake that symlinks the generated `compile_commands.json` (see examples above), then run `nix develop` (or use `direnv`) before opening your editor.
 
 ## Notes
 
 - You can change the version of `qmk_firmware` used by nixcaps by overriding its `qmk_firmware` flake input as follows:
 
   ```nix
-  nixcaps.inputs.qmk_firmware.url = "git+https://github.com/qmk/qmk_firmware?submodules=1&rev=<COMMIT_SHA>";
+  nixcaps.inputs.qmk_firmware.ref = "<COMMIT_SHA_OR_GIT_TAG>";
   ```
 
 - Under the hood, this derivation first copies the files in `src` into `keyboards/<keyboard>/keymaps/nixcaps` inside an internal copy of the `qmk_firmware` repo, and then executes `qmk compile --keyboard <keyboard>[/<variant>] --keymap nixcaps`.

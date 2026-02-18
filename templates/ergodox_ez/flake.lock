@@ -43,11 +43,11 @@
         "qmk_firmware": "qmk_firmware"
       },
       "locked": {
-        "lastModified": 1766998630,
-        "narHash": "sha256-ivLfAmP9F4sabPFqtNrtwP4pMUAsuNhl1h+otv2C8KI=",
+        "lastModified": 1771443160,
+        "narHash": "sha256-PEyYhQ5D5pP7vzoK9yv/baesfYLevZGUDGMCjLXMKbk=",
         "owner": "agustinmista",
         "repo": "nixcaps",
-        "rev": "b0c77b3cc0e477bd3c99199538c7c90b9a5ce8b9",
+        "rev": "0d45cb2c65c7c6f7fb464b405477a8c21b6b86c4",
         "type": "github"
       },
       "original": {
@@ -93,7 +93,7 @@
       "locked": {
         "lastModified": 1766111009,
         "narHash": "sha256-mF5FLW2Z7i8FS9+6zlrincruofqPwdL1AIK+hToTino=",
-        "ref": "refs/heads/master",
+        "ref": "54e8fad959d6a6e53e08c62ac3a3c4d4bdc6c957",
         "rev": "54e8fad959d6a6e53e08c62ac3a3c4d4bdc6c957",
         "revCount": 29238,
         "submodules": true,
@@ -101,7 +101,7 @@
         "url": "https://github.com/qmk/qmk_firmware"
       },
       "original": {
-        "rev": "54e8fad959d6a6e53e08c62ac3a3c4d4bdc6c957",
+        "ref": "54e8fad959d6a6e53e08c62ac3a3c4d4bdc6c957",
         "submodules": true,
         "type": "git",
         "url": "https://github.com/qmk/qmk_firmware"

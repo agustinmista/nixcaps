@@ -43,14 +43,17 @@
         "qmk_firmware": "qmk_firmware"
       },
       "locked": {
-        "lastModified": 0,
-        "narHash": "sha256-7wZ7FN7Cnm55op5w6t6rL4cWeK73xhCInNgLbsamH5E=",
-        "path": "/nix/store/7l3z4jfvsm9fcm2vz6jns9l46w1jpbaq-source",
-        "type": "path"
+        "lastModified": 1771443160,
+        "narHash": "sha256-PEyYhQ5D5pP7vzoK9yv/baesfYLevZGUDGMCjLXMKbk=",
+        "owner": "agustinmista",
+        "repo": "nixcaps",
+        "rev": "0d45cb2c65c7c6f7fb464b405477a8c21b6b86c4",
+        "type": "github"
       },
       "original": {
-        "path": "/nix/store/7l3z4jfvsm9fcm2vz6jns9l46w1jpbaq-source",
-        "type": "path"
+        "owner": "agustinmista",
+        "repo": "nixcaps",
+        "type": "github"
       }
     },
     "nixpkgs": {

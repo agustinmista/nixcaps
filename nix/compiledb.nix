@@ -19,16 +19,16 @@ in
 stdenv.mkDerivation {
   name = "${qmk_args.keymapName}-compiledb";
   src = qmk_firmware;
+  nativeBuildInputs = [ python313 ];
   buildInputs = [
     qmk
     jq
-    python313
   ];
 
   postPatch = ''
     mkdir -p ${qmk_args.keymapDir}
     cp -r ${src}/* ${qmk_args.keymapDir}/
-    patchShebangs --host ${python313}/bin
+    patchShebangs util lib
   '';
 
   buildPhase = ''

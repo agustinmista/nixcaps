@@ -18,15 +18,13 @@ in
 stdenv.mkDerivation {
   name = "${qmk_args.keymapName}-firmware";
   src = qmk_firmware;
-  buildInputs = [
-    qmk
-    python313
-  ];
+  nativeBuildInputs = [ python313 ];
+  buildInputs = [ qmk ];
 
   postPatch = ''
     mkdir -p ${qmk_args.keymapDir}
     cp -r ${src}/* ${qmk_args.keymapDir}/
-    patchShebangs --host ${python313}/bin
+    patchShebangs util lib
   '';
 
   buildPhase = ''

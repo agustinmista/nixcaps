@@ -17,7 +17,7 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         nixcaps = inputs.nixcaps.lib.${system};
-        ergodoz_ez = {
+        ergodox_ez = {
           src = ./.;
           # path within the qmk_firmware tree
           # to the keyboard's directory,
@@ -32,15 +32,15 @@
       in
       {
         # Build with `nix build`
-        packages.default = nixcaps.mkQmkFirmware ergodoz_ez;
+        packages.default = nixcaps.mkQmkFirmware ergodox_ez;
         # Flash with `nix run`
-        apps.default = nixcaps.flashQmkFirmware ergodoz_ez;
+        apps.default = nixcaps.flashQmkFirmware ergodox_ez;
         devShells.default = pkgs.mkShell {
           QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];
           shellHook =
             let
-              compile_db = nixcaps.mkCompileDb ergodoz_ez;
+              compile_db = nixcaps.mkCompileDb ergodox_ez;
             in
             ''
               ln -sf "${compile_db}/compile_commands.json" ./compile_commands.json

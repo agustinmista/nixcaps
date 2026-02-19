@@ -169,11 +169,11 @@ To enable LSP support, add a dev shell to your flake that symlinks the generated
 - You can change the version of `qmk_firmware` used by nixcaps by overriding its `qmk_firmware` flake input as follows:
 
   ```nix
-  nixcaps.inputs.qmk_firmware.ref = "<COMMIT_SHA_OR_GIT_TAG>";
+  nixcaps.inputs.qmk_firmware.url = "github:qmk/qmk_firmware?rev=<COMMIT_SHA_OR_GIT_TAG>";
   ```
 
 - Under the hood, this derivation first copies the files in `src` into `keyboards/<keyboard>/keymaps/nixcaps` inside an internal copy of the `qmk_firmware` repo, and then executes `qmk compile --keyboard <keyboard>[/<variant>] --keymap nixcaps`.
 
 - While it should be possible to flash the compiled firmwares using `qmk flash`, this command is only available while inside the `qmk_firmware` repo. So, it is not enough to provide such a derivation with just the compiled firmware, and one would have to copy the entire (or a large part of) the `qmk_firmware` repo as well. If you know how to implement this in an efficient way, let me know!
 
-- To ensure reproducibily, this builder calls `qmk compile` with the `SKIP_GIT=true` env var. This avoids some of the issues [others have observed](https://discourse.nixos.org/t/fetchgit-hash-mismatch-with-qmk-firmware-submodules/49667) while trying work with `qmk_firmware` in Nix. If your keyboard config relies on `qmk compile` using git for any reason, this probably won't work!
+- To ensure reproducibility, this builder calls `qmk compile` with the `SKIP_GIT=true` env var. This avoids some of the issues [others have observed](https://discourse.nixos.org/t/fetchgit-hash-mismatch-with-qmk-firmware-submodules/49667) while trying work with `qmk_firmware` in Nix. If your keyboard config relies on `qmk compile` using git for any reason, this probably won't work!

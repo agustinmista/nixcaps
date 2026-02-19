@@ -7,7 +7,7 @@
     nixcaps.url = "github:agustinmista/nixcaps";
     # Uncomment the next line if you want to use a specific revision of
     # qmk_firmware.
-    # nixcaps.inputs.qmk_firmware.ref = "54e8fad959d6a6e53e08c62ac3a3c4d4bdc6c957";
+    # nixcaps.inputs.qmk_firmware.url = "github:qmk/qmk_firmware?rev=<COMMIT_SHA_OR_TAG>";
   };
 
   outputs =

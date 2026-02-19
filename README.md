@@ -168,9 +168,23 @@ To enable LSP support, add a dev shell to your flake that symlinks the generated
 
 - You can change the version of `qmk_firmware` used by nixcaps by overriding its `qmk_firmware` flake input as follows:
 
-  ```nix
-  nixcaps.inputs.qmk_firmware.url = "github:qmk/qmk_firmware?rev=<COMMIT_SHA_OR_GIT_TAG>";
-  ```
+```nix
+  # Don't forget the `submodules=1` part
+  nixcaps.inputs.qmk_firmware.url = "git+https://github.com/qmk/qmk_firmware?submodules=1&rev=<COMMIT_SHA>";
+```
+
+Or, alternatively, you can do:
+
+```nix
+qmk_firmware = {
+  url = "https://github.com/qmk/qmk_firmware";
+  ref = "0.31.11"; # you can use git tags here too
+  flake = false;
+  type = "git";
+  submodules = true;
+};
+nixcaps.inputs.qmk_firmware.follows = "qmk_firmware";
+```
 
 - Under the hood, this derivation first copies the files in `src` into `keyboards/<keyboard>/keymaps/nixcaps` inside an internal copy of the `qmk_firmware` repo, and then executes `qmk compile --keyboard <keyboard>[/<variant>] --keymap nixcaps`.
 

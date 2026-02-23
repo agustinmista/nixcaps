@@ -6,8 +6,18 @@
     flake-utils.url = "github:numtide/flake-utils";
     nixcaps.url = "github:agustinmista/nixcaps";
     # Uncomment the next line if you want to use a specific revision of
-    # qmk_firmware.
-    # nixcaps.inputs.qmk_firmware.url = "github:qmk/qmk_firmware?rev=<COMMIT_SHA_OR_TAG>";
+    # qmk_firmware. Don't forget the `submodules=1` parameter
+    # nixcaps.inputs.qmk_firmware.url = "git+https://github.com/qmk/qmk_firmware?submodules=1&rev=<COMMIT_SHA>";
+    #
+    # or, alternatively, you can do:
+    # qmk_firmware = {
+    #   url = "https://github.com/qmk/qmk_firmware";
+    #   ref = "0.31.11"; # you can use git tags here too
+    #   flake = false;
+    #   type = "git";
+    #   submodules = true;
+    # };
+    # nixcaps.inputs.qmk_firmware.follows = "qmk_firmware";
   };
 
   outputs =

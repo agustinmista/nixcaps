@@ -7,7 +7,7 @@
 let
   keyboardVariant = if variant == null then "${keyboard}" else "${keyboard}/${variant}";
   keyboardName = lib.last (lib.splitString "/" keyboard);
-  keymapName = "${keyboardName}-default";
+  keymapName = "${keyboardName}-nixcaps";
 in
 {
   inherit

@@ -65,7 +65,7 @@ Here is a minimal example showing how to use `nixcaps` for the Ergodox EZ keyboa
         packages.default = nixcaps.mkQmkFirmware ergodox_ez;
         apps.default = nixcaps.flashQmkFirmware ergodox_ez;
         devShells.default = pkgs.mkShell {
-          QMK_HOME = "${nixcaps.inputs.qmk_firmware}";
+          QMK_HOME = "${inputs.nixcaps.inputs.qmk_firmware}";
           packages = [ pkgs.qmk ];
           shellHook = ''
             ln -sf "${nixcaps.mkCompileDb ergodox_ez}/compile_commands.json" ./compile_commands.json
